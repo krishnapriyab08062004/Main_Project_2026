@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Speech Emotion Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🎤 Speech Emotion Recognition</h1>
+
+        <div class="modes">
+            <h2>1. File Upload</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="audio" accept=".wav" required>
+                <button type="submit">Predict Emotion</button>
+            </form>
+
+            {% if prediction %}
+            <div class="result">
+                <h3>Prediction Result:</h3>
+                <p class="emotion">{{ prediction }}</p>
+                <p>Confidence: {{ confidence }}%</p>
+            </div>
+            {% endif %}
+
+            <hr>
+
+            <!-- <h2>2. Real-Time Recording</h2>
+            <div class="realtime-controls">
+                <button id="start-btn" style="background-color: #4CAF50; color: white;">Start Recording</button>
+                <button id="stop-btn" style="background-color: #f44336; color: white;" disabled>Stop Recording</button>
+            </div> -->
+
+            <div id="realtime-result" class="result" style="display: none; margin-top: 15px;">
+                <h3>Live Emotion:</h3>
+                <p class="emotion" id="live-emotion">Listening...</p>
+                <p>Confidence: <span id="live-confidence">--</span>%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Audio & MediaRecorder Implementation -->
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordInterval;
+
+        const startBtn = document.getElementById("start-btn");
+        const stopBtn = document.getElementById("stop-btn");
+        const liveResultDiv = document.getElementById("realtime-result");
+        const liveEmotion = document.getElementById("live-emotion");
+        const liveConfidence = document.getElementById("live-confidence");
+
+        startBtn.addEventListener("click", async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                startRecordingCycle(stream);
+
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                liveResultDiv.style.display = "block";
+                liveEmotion.innerText = "Connecting...";
+
+            } catch (err) {
+                alert("Microphone access denied or unavailable.");
+                console.error(err);
+            }
+        });
+
+        stopBtn.addEventListener("click", () => {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+            clearInterval(recordInterval);
+
+            // Stop all audio tracks
+            if (mediaRecorder && mediaRecorder.stream) {
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            liveEmotion.innerText = "Stopped.";
+        });
+
+        function startRecordingCycle(stream) {
+            // Record and send chunks every 3 seconds
+            const chunkTimeMs = 3000;
+
+            function recordChunk() {
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                mediaRecorder.start();
+
+                liveEmotion.innerText = "Recording chunk...";
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioChunks = []; // reset
+                    sendChunkToServer(audioBlob);
+                };
+
+                setTimeout(() => {
+                    if (mediaRecorder.state !== "inactive") {
+                        mediaRecorder.stop();
+                    }
+                }, chunkTimeMs);
+            }
+
+            recordChunk();
+            recordInterval = setInterval(recordChunk, chunkTimeMs);
+        }
+
+        async function sendChunkToServer(blob) {
+            liveEmotion.innerText = "Analyzing...";
+            const formData = new FormData();
+            // Server expects 'audio' field
+            formData.append("audio", blob, "live_chunk.webm");
+
+            try {
+                const response = await fetch("/predict_realtime", {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.prediction) {
+                    liveEmotion.innerText = result.prediction;
+                    liveConfidence.innerText = result.confidence;
+
+                    // Add slight scale animation
+                    liveEmotion.style.transform = "scale(1.1)";
+                    setTimeout(() => liveEmotion.style.transform = "scale(1)", 200);
+                } else if (result.error) {
+                    console.error("Server Error:", result.error);
+                }
+            } catch (e) {
+                console.error("Fetch Error:", e);
+            }
+        }
+    </script>
+</body>
+
+</html>

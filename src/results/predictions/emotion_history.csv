@@ -1,0 +1,8 @@
+timestamp,emotion,confidence,audio_file,alerted
+2026-02-20 22:25:05,neutral,0.85,test_001.wav,False
+2026-02-20 22:25:05,happy,0.72,test_002.wav,False
+2026-02-20 22:25:05,angry,0.78,test_003.wav,True
+2026-02-20 22:25:05,sad,0.68,test_004.wav,False
+2026-02-20 22:25:05,sad,0.73,test_005.wav,True
+2026-02-20 22:25:05,fearful,0.82,test_006.wav,True
+2026-02-20 22:25:05,calm,0.9,test_007.wav,False
