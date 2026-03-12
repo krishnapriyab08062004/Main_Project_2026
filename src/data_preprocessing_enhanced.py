@@ -418,7 +418,7 @@ if __name__ == "__main__":
     # Preprocess with augmentation and advanced features
     data = preprocess_dataset_enhanced(
         use_augmentation=True,
-        augmentation_factor=3,
+        augmentation_factor=AUGMENTATION_FACTOR,
         include_advanced_features=True
     )
     

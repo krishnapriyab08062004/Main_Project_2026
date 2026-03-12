@@ -45,17 +45,35 @@ EMOTION_LABELS = [
     'angry', 'fearful', 'disgust', 'surprised'
 ]
 
-# CNN-DNN configuration
-CNN_DNN_CONFIG = {
-    'conv1_filters': 64,
-    'conv1_kernel': 5,
-    'conv2_filters': 128,
-    'conv2_kernel': 5,
-    'pool_size': 2,
-    'dropout_1': 0.3,
-    'dropout_2': 0.4,
-    'dense_1_units': 256,
-    'dense_2_units': 128,
+# CNN-DNN v2 configuration (Higher accuracy)
+CNN_DNN_V2_CONFIG = {
+    'blocks': [64, 128, 256, 512],
+    'kernel_sizes': [11, 7, 5, 3],
+    'dropout_rates': [0.4, 0.4, 0.5, 0.5],
+    'dense_units': [512, 256],
+    'se_ratio': 16,
+    'swa_start_epoch': 80
+}
+
+# CNN-LSTM v2 configuration (Higher accuracy)
+CNN_LSTM_V2_CONFIG = {
+    'conv_filters': [128, 256],
+    'kernel_size': 5,
+    'lstm_units': [256, 128],
+    'attention_heads': 8,
+    'attention_dim': 64,
+    'dropout_rates': [0.4, 0.5, 0.6],
+    'swa_start_epoch': 80
+}
+
+# ResNet-Attention configuration
+RESNET_ATTENTION_CONFIG = {
+    'filters': [128, 256, 512],
+    'kernel_sizes': [7, 5, 3],
+    'attention_heads': 4,
+    'attention_dim': 128,
+    'dropout_rate': 0.4,
+    'dense_units': [512, 256]
 }
 
 # CNN-LSTM configuration
@@ -78,16 +96,22 @@ CNN_LSTM_CONFIG = {
 # ============================================================================
 
 # Training parameters
-EPOCHS = 100  # Increased for better convergence
-BATCH_SIZE = 16  # Smaller batch size for more frequent updates
-LEARNING_RATE = 0.001
+# Training parameters
+EPOCHS = 150  # Increased for deeper model convergence
+BATCH_SIZE = 32 # Increased for better gradient stability
+LEARNING_RATE = 0.0003  # Lowered for more stable convergence
 VALIDATION_SPLIT = 0.2
 
 # Callbacks
-EARLY_STOPPING_PATIENCE = 15  # Increased patience for better training
-REDUCE_LR_PATIENCE = 7  # More patience before reducing LR
+EARLY_STOPPING_PATIENCE = 20  # Increased patience
+REDUCE_LR_PATIENCE = 8
 REDUCE_LR_FACTOR = 0.5
 MIN_LR = 1e-7
+
+# Advanced Hyperparameters
+LABEL_SMOOTHING = 0.15
+MIXUP_ALPHA = 0.2
+WEIGHT_DECAY = 5e-4
 
 # Model save paths
 MODEL_SAVE_DIR = "models/saved_models"
@@ -156,8 +180,8 @@ PLOT_DPI = 300
 # ============================================================================
 
 # Data augmentation - NOW ENABLED
-USE_DATA_AUGMENTATION = True  # Enable augmentation for better generalization
-AUGMENTATION_FACTOR = 3  # 3x data via augmentation
+USE_DATA_AUGMENTATION = True
+AUGMENTATION_FACTOR = 5  # Increased to 5x for better generalization
 
 # Model ensemble (for future enhancement)
 USE_ENSEMBLE = False

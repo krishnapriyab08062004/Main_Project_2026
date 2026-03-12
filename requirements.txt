@@ -1,0 +1,9 @@
+tensorflow
+numpy
+librosa
+matplotlib
+seaborn
+scikit-learn
+pandas
+joblib
+numpy==1.23.5
