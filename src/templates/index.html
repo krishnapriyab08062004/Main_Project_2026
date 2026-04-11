@@ -1,150 +1,904 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Speech Emotion Recognition</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>SER App — Analyze</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #080c14;
+            --surface: rgba(255, 255, 255, 0.035);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(99, 179, 237, 0.5);
+            --accent: #63b3ed;
+            --accent2: #76e4f7;
+            --text: #e8f0fe;
+            --muted: rgba(232, 240, 254, 0.45);
+            --danger: #fc8181;
+            --success: #68d391;
+            --warning: #f6ad55;
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 5%, rgba(99, 179, 237, 0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 85% 95%, rgba(118, 228, 247, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 179, 237, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 179, 237, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* NAV */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            height: 64px;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            color: var(--text);
+            margin-right: auto;
+        }
+
+        .nav-brand-dot {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(99, 179, 237, 0.35);
+        }
+
+        .nav-brand-dot svg {
+            width: 14px;
+            height: 14px;
+            fill: #080c14;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-links a {
+            padding: 7px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--muted);
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+        }
+
+        .nav-logout {
+            margin-left: 12px;
+            padding: 7px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .nav-logout:hover {
+            color: var(--danger);
+            border-color: rgba(252, 129, 129, 0.3);
+            background: rgba(252, 129, 129, 0.05);
+        }
+
+        /* MAIN */
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #e8f0fe 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* UPLOAD CARD */
+        .upload-card {
+            background: var(--surface);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            margin-bottom: 28px;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(99, 179, 237, 0.2);
+            border-radius: var(--radius);
+            padding: 48px 24px;
+            text-align: center;
+            transition: all 0.25s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragging {
+            border-color: rgba(99, 179, 237, 0.5);
+            background: rgba(99, 179, 237, 0.04);
+        }
+
+        .upload-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(99, 179, 237, 0.15), rgba(118, 228, 247, 0.1));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            border: 1px solid rgba(99, 179, 237, 0.2);
+        }
+
+        .upload-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--accent);
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .upload-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .upload-sub {
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .upload-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(99, 179, 237, 0.08);
+            border: 1px solid rgba(99, 179, 237, 0.2);
+            border-radius: 99px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        #audio-input {
+            display: none;
+        }
+
+        .file-chosen {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(99, 179, 237, 0.06);
+            border: 1px solid rgba(99, 179, 237, 0.2);
+            border-radius: 10px;
+            font-size: 0.84rem;
+        }
+
+        .file-chosen svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent);
+            fill: none;
+            stroke-width: 2;
+            flex-shrink: 0;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-analyze {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            color: #080c14;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(99, 179, 237, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-analyze:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(99, 179, 237, 0.4);
+        }
+
+        .btn-analyze svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: #080c14;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* RESULTS */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .result-card .label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .emotion-display {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .confidence-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--success);
+        }
+
+        .confidence-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #a3f4c5);
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Stress card */
+        .stress-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .stress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stress-label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .stress-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .stress-bar-wrap {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stress-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .stress-ticks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .stress-ticks span {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        /* Alert */
+        .alert-card {
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .alert-danger {
+            background: rgba(252, 129, 129, 0.07);
+            border: 1px solid rgba(252, 129, 129, 0.25);
+        }
+
+        .alert-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .alert-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .alert-text {
+            font-size: 0.88rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        /* Record Card */
+        .record-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .record-card:hover {
+            border-color: rgba(66, 153, 225, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .record-btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .record-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            outline: none;
+        }
+
+        .record-btn:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+        }
+
+        .record-btn::before {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background: #fc8181;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .record-btn.recording {
+            border-color: #fc8181;
+            background: rgba(252, 129, 129, 0.1);
+            animation: pulse-red 1.5s infinite;
+        }
+
+        .record-btn.recording::before {
+            border-radius: 4px;
+            transform: scale(0.8);
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(252, 129, 129, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(252, 129, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(252, 129, 129, 0); }
+        }
+
+        .record-timer {
+            font-family: 'Inter', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        #visualizer {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+            border-radius: 12px;
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-
-    <div class="container">
-        <h1>🎤 Speech Emotion Recognition</h1>
-
-        <div class="modes">
-            <h2>1. File Upload</h2>
-            <form method="POST" enctype="multipart/form-data">
-                <input type="file" name="audio" accept=".wav" required>
-                <button type="submit">Predict Emotion</button>
-            </form>
-
-            {% if prediction %}
-            <div class="result">
-                <h3>Prediction Result:</h3>
-                <p class="emotion">{{ prediction }}</p>
-                <p>Confidence: {{ confidence }}%</p>
+    <nav>
+        <a href="/" class="nav-brand">
+            <div class="nav-brand-dot">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 3c-1.5 0-3 .8-3 2.5C9 7 10 8 10 9.5c0 .8-.5 1.5-1 2l1 1c1-1 2-2 2-3.5 0-2-1-3-1-4.5 0-.8.4-1.5 1-2zm4 0c-1.5 0-3 .8-3 2.5C13 7 14 8 14 9.5c0 .8-.5 1.5-1 2l1 1c1-1 2-2 2-3.5 0-2-1-3-1-4.5 0-.8.4-1.5 1-2zM5 13c0 3.9 3.1 7 7 7s7-3.1 7-7H5z" />
+                </svg>
             </div>
-            {% endif %}
+            SER Platform
+        </a>
+        <div class="nav-links">
+            <a href="/" class="active">Analyze</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analytics">Analytics</a>
+        </div>
+        <a href="/logout" class="nav-logout">Sign out</a>
+    </nav>
 
-            <hr>
+    <main>
+        <div class="page-header">
+            <h1>Speech Emotion Recognition</h1>
+            <p>Upload a WAV audio file to detect emotion and measure stress levels in real-time</p>
+        </div>
 
-            <!-- <h2>2. Real-Time Recording</h2>
-            <div class="realtime-controls">
-                <button id="start-btn" style="background-color: #4CAF50; color: white;">Start Recording</button>
-                <button id="stop-btn" style="background-color: #f44336; color: white;" disabled>Stop Recording</button>
-            </div> -->
+        <div class="upload-card">
+            <form method="POST" enctype="multipart/form-data" id="upload-form">
+                <div class="upload-zone" id="drop-zone" onclick="document.getElementById('audio-input').click()">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 18V6m0 0-4 4m4-4 4 4" />
+                            <path d="M3 18h18" />
+                        </svg>
+                    </div>
+                    <div class="upload-title">Drop your audio file here</div>
+                    <div class="upload-sub">or click to browse your files</div>
+                    <div class="upload-badge">
+                        <svg style="width:10px;height:10px;stroke:var(--accent);fill:none;stroke-width:2"
+                            viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        Audio formats: .wav, .mp3, .m4a
+                    </div>
+                    <input type="file" name="audio" id="audio-input" accept="audio/*" required>
+                </div>
+                <div class="file-chosen" id="file-chosen">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                    </svg>
+                    <span id="file-name">No file selected</span>
+                </div>
+                <button type="submit" class="btn-analyze">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    Analyze Emotion
+                </button>
+            </form>
+        </div>
 
-            <div id="realtime-result" class="result" style="display: none; margin-top: 15px;">
-                <h3>Live Emotion:</h3>
-                <p class="emotion" id="live-emotion">Listening...</p>
-                <p>Confidence: <span id="live-confidence">--</span>%</p>
+        <!-- Results section — rendered by Jinja when prediction exists -->
+        {% if prediction %}
+        <div class="results-grid">
+            <div class="result-card">
+                <div class="label">Primary Detected</div>
+                <div class="emotion-display">{{ prediction }}</div>
+            </div>
+            <div class="result-card">
+                <div class="label">Confidence</div>
+                <div class="confidence-num">{{ confidence }}%</div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: {{ confidence }}%"></div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Web Audio & MediaRecorder Implementation -->
+        {% if top_emotions %}
+        <div class="stress-card" style="padding: 20px; margin-bottom: 20px;">
+            <div class="label" style="font-size: 0.72rem; color: var(--muted); margin-bottom: 15px; text-transform: uppercase;">Confidence Breakdown</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for item in top_emotions %}
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.85rem;">
+                        <span>{{ item.name | capitalize }}</span>
+                        <span>{{ item.prob }}%</span>
+                    </div>
+                    <div style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                        <div style="height: 100%; width: {{ item.prob }}%; background: var(--accent); opacity: {{ 1.0 - (loop.index0 * 0.3) }}; border-radius: 3px;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        {% if stress_score is not none %}
+        <div class="stress-card">
+            <div class="stress-header">
+                <div class="stress-label">Stress Level</div>
+                <div class="stress-value"
+                    style="color: {% if stress_score > 0.7 %}var(--danger){% elif stress_score > 0.4 %}var(--warning){% else %}var(--success){% endif %}">
+                    {{ (stress_score * 100) | int }}%
+                </div>
+            </div>
+            <div class="stress-bar-wrap">
+                <div class="stress-bar-fill"
+                    style="width: {{ (stress_score * 100) | int }}%; background: {% if stress_score > 0.7 %}linear-gradient(90deg, #fc8181, #feb2b2){% elif stress_score > 0.4 %}linear-gradient(90deg, #f6ad55, #fbd38d){% else %}linear-gradient(90deg, #68d391, #9ae6b4){% endif %}">
+                </div>
+            </div>
+            <div class="stress-ticks">
+                <span>Calm</span>
+                <span>Moderate</span>
+                <span>High Stress</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="record-card">
+            <div class="label" style="margin-bottom: 20px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Live Recording</div>
+            <div class="record-btn-container">
+                <button id="record-btn" class="record-btn" title="Start Recording"></button>
+                <div id="record-timer" class="record-timer">00:00</div>
+                <div id="record-status" style="font-size: 0.85rem; color: var(--muted);">Click to start recording your voice</div>
+                <canvas id="visualizer"></canvas>
+            </div>
+            <form id="record-form" method="POST" enctype="multipart/form-data" style="display: none;">
+                <input type="file" name="audio" id="record-blob-input">
+            </form>
+        </div>
+    </main>
+
     <script>
-        let mediaRecorder;
-        let audioChunks = [];
-        let recordInterval;
+        const zone = document.getElementById('drop-zone');
+        const input = document.getElementById('audio-input');
+        const fileChosen = document.getElementById('file-chosen');
+        const fileName = document.getElementById('file-name');
 
-        const startBtn = document.getElementById("start-btn");
-        const stopBtn = document.getElementById("stop-btn");
-        const liveResultDiv = document.getElementById("realtime-result");
-        const liveEmotion = document.getElementById("live-emotion");
-        const liveConfidence = document.getElementById("live-confidence");
+        input.addEventListener('change', () => {
+            if (input.files[0]) {
+                fileName.textContent = input.files[0].name;
+                fileChosen.style.display = 'flex';
+            }
+        });
 
-        startBtn.addEventListener("click", async () => {
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragging'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('dragging');
+            if (e.dataTransfer.files[0]) {
+                input.files = e.dataTransfer.files;
+                fileName.textContent = e.dataTransfer.files[0].name;
+                fileChosen.style.display = 'flex';
+            }
+        });
+
+        // Live Recording Logic (WAV Encoder for zero-dependency backend)
+        const recordBtn = document.getElementById('record-btn');
+        const recordTimer = document.getElementById('record-timer');
+        const recordStatus = document.getElementById('record-status');
+        const visualizer = document.getElementById('visualizer');
+        const canvasCtx = visualizer.getContext('2d');
+        
+        let recCtx;
+        let recProcessor;
+        let recStreamSource;
+        let recAnalyser;
+        let leftchannel = [];
+        let recordingLength = 0;
+        let recSampleRate = 44100;
+        let timerInterval;
+        let startTime;
+        let isRecording = false;
+
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+
+        async function startRecording() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                startRecordingCycle(stream);
+                isRecording = true;
+                leftchannel = [];
+                recordingLength = 0;
+                
+                recCtx = new (window.AudioContext || window.webkitAudioContext)();
+                recSampleRate = recCtx.sampleRate;
+                
+                recAnalyser = recCtx.createAnalyser();
+                recAnalyser.fftSize = 256;
+                
+                recStreamSource = recCtx.createMediaStreamSource(stream);
+                recProcessor = recCtx.createScriptProcessor(4096, 1, 1);
 
-                startBtn.disabled = true;
-                stopBtn.disabled = false;
-                liveResultDiv.style.display = "block";
-                liveEmotion.innerText = "Connecting...";
+                recStreamSource.connect(recAnalyser);
+                recAnalyser.connect(recProcessor);
+                recProcessor.connect(recCtx.destination);
 
+                recProcessor.onaudioprocess = (e) => {
+                    if (!isRecording) return;
+                    const left = e.inputBuffer.getChannelData(0);
+                    leftchannel.push(new Float32Array(left));
+                    recordingLength += 4096;
+                };
+
+                recordBtn.classList.add('recording');
+                recordStatus.textContent = 'Recording... Click again to stop and analyze';
+                visualizer.style.display = 'block';
+                
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                draw();
             } catch (err) {
-                alert("Microphone access denied or unavailable.");
-                console.error(err);
+                console.error('Recording error:', err);
+                alert('Microphone access denied or error occurred.');
             }
-        });
-
-        stopBtn.addEventListener("click", () => {
-            if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                mediaRecorder.stop();
-            }
-            clearInterval(recordInterval);
-
-            // Stop all audio tracks
-            if (mediaRecorder && mediaRecorder.stream) {
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            }
-
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            liveEmotion.innerText = "Stopped.";
-        });
-
-        function startRecordingCycle(stream) {
-            // Record and send chunks every 3 seconds
-            const chunkTimeMs = 3000;
-
-            function recordChunk() {
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                mediaRecorder.start();
-
-                liveEmotion.innerText = "Recording chunk...";
-
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    audioChunks = []; // reset
-                    sendChunkToServer(audioBlob);
-                };
-
-                setTimeout(() => {
-                    if (mediaRecorder.state !== "inactive") {
-                        mediaRecorder.stop();
-                    }
-                }, chunkTimeMs);
-            }
-
-            recordChunk();
-            recordInterval = setInterval(recordChunk, chunkTimeMs);
         }
 
-        async function sendChunkToServer(blob) {
-            liveEmotion.innerText = "Analyzing...";
-            const formData = new FormData();
-            // Server expects 'audio' field
-            formData.append("audio", blob, "live_chunk.webm");
-
-            try {
-                const response = await fetch("/predict_realtime", {
-                    method: "POST",
-                    body: formData
-                });
-                const result = await response.json();
-
-                if (result.prediction) {
-                    liveEmotion.innerText = result.prediction;
-                    liveConfidence.innerText = result.confidence;
-
-                    // Add slight scale animation
-                    liveEmotion.style.transform = "scale(1.1)";
-                    setTimeout(() => liveEmotion.style.transform = "scale(1)", 200);
-                } else if (result.error) {
-                    console.error("Server Error:", result.error);
-                }
-            } catch (e) {
-                console.error("Fetch Error:", e);
+        function stopRecording() {
+            isRecording = false;
+            if (recProcessor) {
+                recProcessor.onaudioprocess = null;
+                recStreamSource.disconnect();
+                recProcessor.disconnect();
+                recCtx.close();
             }
+            
+            clearInterval(timerInterval);
+            recordBtn.classList.remove('recording');
+            recordStatus.textContent = 'Encoding WAV...';
+            
+            const blob = exportWAV(leftchannel, recordingLength);
+            analyzeBlob(blob);
+        }
+
+        function exportWAV(chunks, length) {
+            const buffer = new Float32Array(length);
+            let offset = 0;
+            for (let i = 0; i < chunks.length; i++) {
+                buffer.set(chunks[i], offset);
+                offset += chunks[i].length;
+            }
+
+            const wavBuffer = new ArrayBuffer(44 + length * 2);
+            const view = new DataView(wavBuffer);
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 32 + length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, recSampleRate, true);
+            view.setUint32(28, recSampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, length * 2, true);
+
+            let index = 44;
+            for (let i = 0; i < length; i++) {
+                let sample = Math.max(-1, Math.min(1, buffer[i]));
+                view.setInt16(index, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                index += 2;
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function updateTimer() {
+            const seconds = Math.floor((Date.now() - startTime) / 1000);
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            recordTimer.textContent = `${mins}:${secs}`;
+        }
+
+        function draw() {
+            if (!isRecording) return;
+            requestAnimationFrame(draw);
+            
+            const dataArray = new Uint8Array(recAnalyser.frequencyBinCount);
+            recAnalyser.getByteFrequencyData(dataArray);
+
+            canvasCtx.fillStyle = 'rgba(26, 32, 44, 0.4)';
+            canvasCtx.fillRect(0, 0, visualizer.width, visualizer.height);
+
+            const barWidth = (visualizer.width / recAnalyser.frequencyBinCount) * 2.5;
+            let x = 0;
+
+            for (let i = 0; i < recAnalyser.frequencyBinCount; i++) {
+                const barHeight = (dataArray[i] / 255) * visualizer.height;
+                canvasCtx.fillStyle = `rgba(66, 153, 225, ${dataArray[i]/255 + 0.2})`;
+                canvasCtx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
+                x += barWidth + 1;
+            }
+        }
+
+        async function analyzeBlob(blob) {
+            recordStatus.textContent = 'Uploading and analyzing...';
+            
+            // Create a file from the blob
+            const file = new File([blob], 'live_recording.wav', { type: 'audio/wav' });
+            
+            // Use DataTransfer to put the file into the hidden input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            
+            const recordBlobInput = document.getElementById('record-blob-input');
+            const recordForm = document.getElementById('record-form');
+            
+            recordBlobInput.files = dataTransfer.files;
+            
+            // Submit the form normally
+            recordForm.submit();
         }
     </script>
 </body>
-
 </html>

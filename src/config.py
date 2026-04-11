@@ -8,7 +8,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DATASET_PATH = r"C:/Users/HP/OneDrive/Desktop/Main Project  2026/SER/data/raw/audio_speech_actors_01-24"
+DATASET_PATH = os.path.join(BASE_DIR, "..", "data", "raw")
 
 
 
@@ -66,15 +66,6 @@ CNN_LSTM_V2_CONFIG = {
     'swa_start_epoch': 80
 }
 
-# ResNet-Attention configuration
-RESNET_ATTENTION_CONFIG = {
-    'filters': [128, 256, 512],
-    'kernel_sizes': [7, 5, 3],
-    'attention_heads': 4,
-    'attention_dim': 128,
-    'dropout_rate': 0.4,
-    'dense_units': [512, 256]
-}
 
 # CNN-LSTM configuration
 CNN_LSTM_CONFIG = {
@@ -99,7 +90,7 @@ CNN_LSTM_CONFIG = {
 # Training parameters
 EPOCHS = 150  # Increased for deeper model convergence
 BATCH_SIZE = 32 # Increased for better gradient stability
-LEARNING_RATE = 0.0003  # Lowered for more stable convergence
+LEARNING_RATE = 0.001  # Increased for faster convergence to 100%
 VALIDATION_SPLIT = 0.2
 
 # Callbacks
@@ -109,13 +100,14 @@ REDUCE_LR_FACTOR = 0.5
 MIN_LR = 1e-7
 
 # Advanced Hyperparameters
-LABEL_SMOOTHING = 0.15
-MIXUP_ALPHA = 0.2
-WEIGHT_DECAY = 5e-4
+LABEL_SMOOTHING = 0.05
+MIXUP_ALPHA = 0.1
+WEIGHT_DECAY = 1e-4
 
-# Model save paths
-MODEL_SAVE_DIR = "models/saved_models"
-CHECKPOINT_DIR = "models/checkpoints"
+# Model save paths (ABSOLUTE)
+ROOT_DIR = os.path.dirname(BASE_DIR)
+MODEL_SAVE_DIR = os.path.join(ROOT_DIR, "models", "saved_models")
+CHECKPOINT_DIR = os.path.join(ROOT_DIR, "models", "checkpoints")
 
 # ============================================================================
 # EVALUATION CONFIGURATION

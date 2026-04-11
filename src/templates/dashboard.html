@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Dashboard — SER App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #080c14;
+            --surface: rgba(255, 255, 255, 0.035);
+            --surface2: rgba(255, 255, 255, 0.025);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #63b3ed;
+            --accent2: #76e4f7;
+            --text: #e8f0fe;
+            --muted: rgba(232, 240, 254, 0.45);
+            --danger: #fc8181;
+            --success: #68d391;
+            --warning: #f6ad55;
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 10% 5%, rgba(99, 179, 237, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 90% 95%, rgba(118, 228, 247, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 179, 237, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 179, 237, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            height: 64px;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            color: var(--text);
+            margin-right: auto;
+        }
+
+        .nav-brand-dot {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(99, 179, 237, 0.35);
+        }
+
+        .nav-brand-dot svg {
+            width: 14px;
+            height: 14px;
+            fill: #080c14;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-links a {
+            padding: 7px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--muted);
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+            background: var(--surface);
+        }
+
+        .nav-logout {
+            margin-left: 12px;
+            padding: 7px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .nav-logout:hover {
+            color: var(--danger);
+            border-color: rgba(252, 129, 129, 0.3);
+            background: rgba(252, 129, 129, 0.05);
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #e8f0fe 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 300;
+        }
+
+        .total-badge {
+            padding: 6px 14px;
+            background: rgba(99, 179, 237, 0.08);
+            border: 1px solid rgba(99, 179, 237, 0.2);
+            border-radius: 99px;
+            font-size: 0.78rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .table-card {
+            background: var(--surface);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        thead th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        tbody td {
+            padding: 16px 24px;
+            font-size: 0.88rem;
+            vertical-align: middle;
+        }
+
+        .emotion-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .emotion-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .emotion-happy {
+            background: rgba(104, 211, 145, 0.1);
+            color: #68d391;
+        }
+
+        .emotion-happy .emotion-dot {
+            background: #68d391;
+        }
+
+        .emotion-sad {
+            background: rgba(99, 179, 237, 0.1);
+            color: var(--accent);
+        }
+
+        .emotion-sad .emotion-dot {
+            background: var(--accent);
+        }
+
+        .emotion-angry {
+            background: rgba(252, 129, 129, 0.1);
+            color: var(--danger);
+        }
+
+        .emotion-angry .emotion-dot {
+            background: var(--danger);
+        }
+
+        .emotion-fearful {
+            background: rgba(246, 173, 85, 0.1);
+            color: var(--warning);
+        }
+
+        .emotion-fearful .emotion-dot {
+            background: var(--warning);
+        }
+
+        .emotion-neutral {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+        }
+
+        .emotion-neutral .emotion-dot {
+            background: var(--muted);
+        }
+
+        .stress-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .stress-mini-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stress-mini-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .time-text {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 300;
+        }
+
+        /* Empty state */
+        .empty-state {
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--surface2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border: 1px solid var(--border);
+        }
+
+        .empty-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--muted);
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .empty-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-sub {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            color: #080c14;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 700;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.15s;
+            box-shadow: 0 4px 16px rgba(99, 179, 237, 0.25);
+        }
+
+        .btn-sm:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/" class="nav-brand">
+            <div class="nav-brand-dot">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 3c-1.5 0-3 .8-3 2.5C9 7 10 8 10 9.5c0 .8-.5 1.5-1 2l1 1c1-1 2-2 2-3.5 0-2-1-3-1-4.5 0-.8.4-1.5 1-2zm4 0c-1.5 0-3 .8-3 2.5C13 7 14 8 14 9.5c0 .8-.5 1.5-1 2l1 1c1-1 2-2 2-3.5 0-2-1-3-1-4.5 0-.8.4-1.5 1-2zM5 13c0 3.9 3.1 7 7 7s7-3.1 7-7H5z" />
+                </svg>
+            </div>
+            SER Platform
+        </a>
+        <div class="nav-links">
+            <a href="/">Analyze</a>
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/analytics">Analytics</a>
+        </div>
+        <a href="/logout" class="nav-logout">Sign out</a>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <div>
+                <h1>Emotion Logs</h1>
+                <p>Your recent speech analysis history</p>
+            </div>
+            {% if logs %}
+            <div class="total-badge">{{ logs | length }} records</div>
+            {% endif %}
+        </div>
+
+        <div class="table-card">
+            {% if logs %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Emotion</th>
+                        <th>Stress Level</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td style="color: var(--muted); font-size: 0.8rem;">{{ loop.index }}</td>
+                        <td>
+                            <div class="emotion-chip emotion-{{ log[0] | lower }}">
+                                <div class="emotion-dot"></div>
+                                {{ log[0] }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="stress-pill">
+                                <div class="stress-mini-bar">
+                                    <div class="stress-mini-fill" style="
+                                        width: {{ (log[1] * 100) | int }}%;
+                                        background: {% if log[1] > 0.7 %}var(--danger){% elif log[1] > 0.4 %}var(--warning){% else %}var(--success){% endif %}
+                                    "></div>
+                                </div>
+                                <span
+                                    style="color: {% if log[1] > 0.7 %}var(--danger){% elif log[1] > 0.4 %}var(--warning){% else %}var(--success){% endif %}">
+                                    {{ (log[1] * 100) | int }}%
+                                </span>
+                            </div>
+                        </td>
+                        <td><span class="time-text">{{ log[2] }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                    </svg>
+                </div>
+                <div class="empty-title">No emotion logs yet</div>
+                <div class="empty-sub">Upload an audio file to see your first analysis result here</div>
+                <a href="/" class="btn-sm">Start Analyzing →</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+
+</html>

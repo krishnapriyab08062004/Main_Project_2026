@@ -73,8 +73,10 @@ def test_unseen_data():
     scaler_path = os.path.join(PROCESSED_DATA_DIR, "scaler.pkl")
     label_path = os.path.join(PROCESSED_DATA_DIR, "label_encoder.pkl")
     
-    # Try to find the best model
-    model_path = os.path.join(CHECKPOINT_DIR, "cnn_dnn_v2_best.keras")
+    # Prioritize the best performing model
+    model_path = os.path.join(CHECKPOINT_DIR, "cnn_lstm_attention_finetuned_best.keras")
+    if not os.path.exists(model_path):
+        model_path = os.path.join(CHECKPOINT_DIR, "cnn_lstm_attention_best.keras")
     if not os.path.exists(model_path):
         model_path = os.path.join(CHECKPOINT_DIR, "cnn_lstm_v2_best.keras")
     

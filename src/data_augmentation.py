@@ -26,7 +26,7 @@ def time_stretch(audio, rate=None):
         np.array: Time-stretched audio
     """
     if rate is None:
-        rate = random.uniform(0.8, 1.2)
+        rate = random.uniform(0.75, 1.25)  # Slightly wider range
     
     return librosa.effects.time_stretch(audio, rate=rate)
 
@@ -44,7 +44,7 @@ def pitch_shift(audio, sr=22050, n_steps=None):
         np.array: Pitch-shifted audio
     """
     if n_steps is None:
-        n_steps = random.uniform(-2, 2)
+        n_steps = random.uniform(-2.5, 2.5)  # Slightly wider range
     
     return librosa.effects.pitch_shift(audio, sr=sr, n_steps=n_steps)
 
@@ -61,7 +61,7 @@ def add_noise(audio, noise_factor=None):
         np.array: Audio with added noise
     """
     if noise_factor is None:
-        noise_factor = random.uniform(0.001, 0.01)
+        noise_factor = random.uniform(0.001, 0.015)  # Increased max noise
     
     noise = np.random.randn(len(audio))
     augmented = audio + noise_factor * noise

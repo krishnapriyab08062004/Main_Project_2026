@@ -6,4 +6,10 @@ seaborn
 scikit-learn
 pandas
 joblib
-numpy==1.23.5
+numpy==1.26.4
+soundfile
+flask
+flask-login
+flask-mysqldb
+flask-mail
+werkzeug

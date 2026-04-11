@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Analytics — SER App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #080c14;
+            --surface: rgba(255, 255, 255, 0.035);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #63b3ed;
+            --accent2: #76e4f7;
+            --text: #e8f0fe;
+            --muted: rgba(232, 240, 254, 0.45);
+            --danger: #fc8181;
+            --success: #68d391;
+            --warning: #f6ad55;
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 10% 5%, rgba(99, 179, 237, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 90% 95%, rgba(118, 228, 247, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 179, 237, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 179, 237, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            height: 64px;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            color: var(--text);
+            margin-right: auto;
+        }
+
+        .nav-brand-dot {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(99, 179, 237, 0.35);
+        }
+
+        .nav-brand-dot svg {
+            width: 14px;
+            height: 14px;
+            fill: #080c14;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-links a {
+            padding: 7px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            color: var(--muted);
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+            background: var(--surface);
+        }
+
+        .nav-logout {
+            margin-left: 12px;
+            padding: 7px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .nav-logout:hover {
+            color: var(--danger);
+            border-color: rgba(252, 129, 129, 0.3);
+            background: rgba(252, 129, 129, 0.05);
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #e8f0fe 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 300;
+        }
+
+        /* Stat cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 24px;
+            animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.05s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+
+        .stat-sub {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        /* Chart card */
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 28px 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 280px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/" class="nav-brand">
+            <div class="nav-brand-dot">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 3c-1.5 0-3 .8-3 2.5C9 7 10 8 10 9.5c0 .8-.5 1.5-1 2l1 1c1-1 2-2 2-3.5 0-2-1-3-1-4.5 0-.8.4-1.5 1-2zm4 0c-1.5 0-3 .8-3 2.5C13 7 14 8 14 9.5c0 .8-.5 1.5-1 2l1 1c1-1 2-2 2-3.5 0-2-1-3-1-4.5 0-.8.4-1.5 1-2zM5 13c0 3.9 3.1 7 7 7s7-3.1 7-7H5z" />
+                </svg>
+            </div>
+            SER Platform
+        </a>
+        <div class="nav-links">
+            <a href="/">Analyze</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analytics" class="active">Analytics</a>
+        </div>
+        <a href="/logout" class="nav-logout">Sign out</a>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <h1>Stress Analytics</h1>
+            <p>Visualize your stress patterns over time</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Sessions</div>
+                <div class="stat-value" style="color: var(--accent)">{{ scores | length if scores else 0 }}</div>
+                <div class="stat-sub">Audio samples analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Stress</div>
+                <div class="stat-value" style="color: var(--warning)">
+                    {% if scores %}{{ ((scores | sum / scores | length) * 100) | int }}%{% else %}—{% endif %}
+                </div>
+                <div class="stat-sub">Across all sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Peak Stress</div>
+                <div class="stat-value" style="color: var(--danger)">
+                    {% if scores %}{{ (scores | max * 100) | int }}%{% else %}—{% endif %}
+                </div>
+                <div class="stat-sub">Highest recorded</div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">Stress Score Over Time</div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--accent)"></div>
+                        Stress Score
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: rgba(99,179,237,0.2)"></div>
+                        Trend Area
+                    </div>
+                </div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const labels = {{ dates | tojson }};
+        const rawData = {{ scores | tojson }};
+        const data = rawData.map(v => parseFloat((v * 100).toFixed(1)));
+
+        const ctx = document.getElementById("chart").getContext("2d");
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient.addColorStop(0, 'rgba(99,179,237,0.18)');
+        gradient.addColorStop(1, 'rgba(99,179,237,0)');
+
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Stress Score (%)",
+                    data: data,
+                    fill: true,
+                    backgroundColor: gradient,
+                    borderColor: '#63b3ed',
+                    borderWidth: 2.5,
+                    tension: 0.4,
+                    pointBackgroundColor: '#63b3ed',
+                    pointBorderColor: '#080c14',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#76e4f7',
+                    pointHoverBorderColor: '#080c14',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(12,18,30,0.95)',
+                        borderColor: 'rgba(99,179,237,0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        titleFont: { family: 'Syne', size: 13, weight: '700' },
+                        bodyFont: { family: 'DM Sans', size: 12 },
+                        titleColor: '#e8f0fe',
+                        bodyColor: 'rgba(232,240,254,0.6)',
+                        callbacks: {
+                            label: ctx => ` Stress: ${ctx.raw}%`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                        ticks: {
+                            color: 'rgba(232,240,254,0.4)',
+                            font: { family: 'DM Sans', size: 11 },
+                            maxRotation: 0,
+                        },
+                        border: { display: false }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                        ticks: {
+                            color: 'rgba(232,240,254,0.4)',
+                            font: { family: 'DM Sans', size: 11 },
+                            callback: v => v + '%',
+                            stepSize: 25,
+                        },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
