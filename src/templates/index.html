@@ -18,17 +18,17 @@
         }
 
         :root {
-            --bg: #f8fafc;
-            --surface: rgba(255, 255, 255, 1);
-            --border: rgba(0, 0, 0, 0.08);
-            --border-active: rgba(49, 130, 206, 0.4);
-            --accent: #3182ce;
-            --accent2: #0bc5ea;
-            --text: #1a202c;
-            --muted: rgba(26, 32, 44, 0.6);
-            --danger: #e53e3e;
-            --success: #38a169;
-            --warning: #dd6b20;
+            --bg: #080c14;
+            --surface: rgba(255, 255, 255, 0.035);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(99, 179, 237, 0.5);
+            --accent: #63b3ed;
+            --accent2: #76e4f7;
+            --text: #e8f0fe;
+            --muted: rgba(232, 240, 254, 0.45);
+            --danger: #fc8181;
+            --success: #68d391;
+            --warning: #f6ad55;
             --radius: 14px;
         }
 
@@ -44,8 +44,8 @@
             position: fixed;
             inset: 0;
             background:
-                radial-gradient(ellipse 70% 50% at 15% 5%, rgba(49, 130, 206, 0.08) 0%, transparent 55%),
-                radial-gradient(ellipse 50% 40% at 85% 95%, rgba(11, 197, 234, 0.06) 0%, transparent 50%);
+                radial-gradient(ellipse 70% 50% at 15% 5%, rgba(99, 179, 237, 0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 85% 95%, rgba(118, 228, 247, 0.05) 0%, transparent 50%);
             z-index: 0;
             pointer-events: none;
         }
@@ -55,8 +55,8 @@
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(49, 130, 206, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(49, 130, 206, 0.04) 1px, transparent 1px);
+                linear-gradient(rgba(99, 179, 237, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 179, 237, 0.025) 1px, transparent 1px);
             background-size: 60px 60px;
             z-index: 0;
             pointer-events: none;
@@ -71,7 +71,7 @@
             align-items: center;
             padding: 0 32px;
             height: 64px;
-            background: rgba(248, 250, 252, 0.85);
+            background: rgba(8, 12, 20, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
@@ -98,13 +98,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 16px rgba(49, 130, 206, 0.3);
+            box-shadow: 0 0 16px rgba(99, 179, 237, 0.35);
         }
 
         .nav-brand-dot svg {
             width: 14px;
             height: 14px;
-            fill: #ffffff;
+            fill: #080c14;
         }
 
         .nav-links {
@@ -146,8 +146,8 @@
 
         .nav-logout:hover {
             color: var(--danger);
-            border-color: rgba(229, 62, 62, 0.3);
-            background: rgba(229, 62, 62, 0.08);
+            border-color: rgba(252, 129, 129, 0.3);
+            background: rgba(252, 129, 129, 0.05);
         }
 
         /* MAIN */
@@ -181,7 +181,7 @@
             font-size: 2rem;
             font-weight: 800;
             letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1a202c 0%, var(--accent) 100%);
+            background: linear-gradient(135deg, #e8f0fe 0%, var(--accent2) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -201,12 +201,12 @@
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             margin-bottom: 28px;
         }
 
         .upload-zone {
-            border: 2px dashed rgba(49, 130, 206, 0.2);
+            border: 2px dashed rgba(99, 179, 237, 0.2);
             border-radius: var(--radius);
             padding: 48px 24px;
             text-align: center;
@@ -217,20 +217,20 @@
 
         .upload-zone:hover,
         .upload-zone.dragging {
-            border-color: rgba(49, 130, 206, 0.5);
-            background: rgba(49, 130, 206, 0.04);
+            border-color: rgba(99, 179, 237, 0.5);
+            background: rgba(99, 179, 237, 0.04);
         }
 
         .upload-icon {
             width: 56px;
             height: 56px;
-            background: linear-gradient(135deg, rgba(49, 130, 206, 0.1), rgba(11, 197, 234, 0.08));
+            background: linear-gradient(135deg, rgba(99, 179, 237, 0.15), rgba(118, 228, 247, 0.1));
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 16px;
-            border: 1px solid rgba(49, 130, 206, 0.2);
+            border: 1px solid rgba(99, 179, 237, 0.2);
         }
 
         .upload-icon svg {
@@ -263,7 +263,7 @@
             gap: 6px;
             padding: 5px 12px;
             background: rgba(99, 179, 237, 0.08);
-            border: 1px solid rgba(49, 130, 206, 0.2);
+            border: 1px solid rgba(99, 179, 237, 0.2);
             border-radius: 99px;
             font-size: 0.75rem;
             color: var(--accent);
@@ -281,7 +281,7 @@
             margin-top: 16px;
             padding: 12px 16px;
             background: rgba(99, 179, 237, 0.06);
-            border: 1px solid rgba(49, 130, 206, 0.2);
+            border: 1px solid rgba(99, 179, 237, 0.2);
             border-radius: 10px;
             font-size: 0.84rem;
         }
@@ -494,7 +494,7 @@
 
         .record-card:hover {
             border-color: rgba(66, 153, 225, 0.3);
-            background: rgba(0, 0, 0, 0.04);
+            background: rgba(0, 0, 0, 0.25);
         }
 
         .record-btn-container {
@@ -867,7 +867,7 @@
             const dataArray = new Uint8Array(recAnalyser.frequencyBinCount);
             recAnalyser.getByteFrequencyData(dataArray);
 
-            canvasCtx.fillStyle = 'rgba(26, 32, 44, 0.4)';
+            canvasCtx.fillStyle = 'rgba(232, 240, 254, 0.3)';
             canvasCtx.fillRect(0, 0, visualizer.width, visualizer.height);
 
             const barWidth = (visualizer.width / recAnalyser.frequencyBinCount) * 2.5;
