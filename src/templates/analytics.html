@@ -19,16 +19,16 @@
         }
 
         :root {
-            --bg: #080c14;
-            --surface: rgba(255, 255, 255, 0.035);
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #63b3ed;
-            --accent2: #76e4f7;
-            --text: #e8f0fe;
-            --muted: rgba(232, 240, 254, 0.45);
-            --danger: #fc8181;
-            --success: #68d391;
-            --warning: #f6ad55;
+            --bg: #f8fafc;
+            --surface: rgba(255, 255, 255, 1);
+            --border: rgba(0, 0, 0, 0.08);
+            --accent: #3182ce;
+            --accent2: #0bc5ea;
+            --text: #1a202c;
+            --muted: rgba(26, 32, 44, 0.6);
+            --danger: #e53e3e;
+            --success: #38a169;
+            --warning: #dd6b20;
             --radius: 14px;
         }
 
@@ -44,8 +44,8 @@
             position: fixed;
             inset: 0;
             background:
-                radial-gradient(ellipse 60% 40% at 10% 5%, rgba(99, 179, 237, 0.06) 0%, transparent 55%),
-                radial-gradient(ellipse 50% 40% at 90% 95%, rgba(118, 228, 247, 0.05) 0%, transparent 50%);
+                radial-gradient(ellipse 60% 40% at 10% 5%, rgba(49, 130, 206, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 90% 95%, rgba(11, 197, 234, 0.06) 0%, transparent 50%);
             z-index: 0;
             pointer-events: none;
         }
@@ -55,8 +55,8 @@
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(99, 179, 237, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 179, 237, 0.025) 1px, transparent 1px);
+                linear-gradient(rgba(49, 130, 206, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(49, 130, 206, 0.04) 1px, transparent 1px);
             background-size: 60px 60px;
             z-index: 0;
             pointer-events: none;
@@ -70,7 +70,7 @@
             align-items: center;
             padding: 0 32px;
             height: 64px;
-            background: rgba(8, 12, 20, 0.85);
+            background: rgba(248, 250, 252, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
@@ -97,13 +97,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 16px rgba(99, 179, 237, 0.35);
+            box-shadow: 0 0 16px rgba(49, 130, 206, 0.3);
         }
 
         .nav-brand-dot svg {
             width: 14px;
             height: 14px;
-            fill: #080c14;
+            fill: #ffffff;
         }
 
         .nav-links {
@@ -144,8 +144,8 @@
 
         .nav-logout:hover {
             color: var(--danger);
-            border-color: rgba(252, 129, 129, 0.3);
-            background: rgba(252, 129, 129, 0.05);
+            border-color: rgba(229, 62, 62, 0.3);
+            background: rgba(229, 62, 62, 0.08);
         }
 
         main {
@@ -178,7 +178,7 @@
             font-size: 2rem;
             font-weight: 800;
             letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #e8f0fe 0%, var(--accent2) 100%);
+            background: linear-gradient(135deg, #1a202c 0%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -244,7 +244,7 @@
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 28px 28px 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
             margin-bottom: 20px;
         }
 
@@ -345,7 +345,7 @@
                         Stress Score
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: rgba(99,179,237,0.2)"></div>
+                        <div class="legend-dot" style="background: rgba(49,130,206,0.2)"></div>
                         Trend Area
                     </div>
                 </div>
@@ -364,8 +364,8 @@
         const ctx = document.getElementById("chart").getContext("2d");
 
         const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-        gradient.addColorStop(0, 'rgba(99,179,237,0.18)');
-        gradient.addColorStop(1, 'rgba(99,179,237,0)');
+        gradient.addColorStop(0, 'rgba(49,130,206,0.12)');
+        gradient.addColorStop(1, 'rgba(49,130,206,0)');
 
         new Chart(ctx, {
             type: "line",
@@ -376,16 +376,16 @@
                     data: data,
                     fill: true,
                     backgroundColor: gradient,
-                    borderColor: '#63b3ed',
+                    borderColor: '#3182ce',
                     borderWidth: 2.5,
                     tension: 0.4,
-                    pointBackgroundColor: '#63b3ed',
-                    pointBorderColor: '#080c14',
+                    pointBackgroundColor: '#3182ce',
+                    pointBorderColor: '#f8fafc',
                     pointBorderWidth: 2,
                     pointRadius: 5,
                     pointHoverRadius: 7,
-                    pointHoverBackgroundColor: '#76e4f7',
-                    pointHoverBorderColor: '#080c14',
+                    pointHoverBackgroundColor: '#0bc5ea',
+                    pointHoverBorderColor: '#f8fafc',
                 }]
             },
             options: {
@@ -395,14 +395,14 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(12,18,30,0.95)',
-                        borderColor: 'rgba(99,179,237,0.3)',
+                        backgroundColor: 'rgba(255,255,255,0.98)',
+                        borderColor: 'rgba(49,130,206,0.3)',
                         borderWidth: 1,
                         padding: 12,
                         titleFont: { family: 'Syne', size: 13, weight: '700' },
                         bodyFont: { family: 'DM Sans', size: 12 },
-                        titleColor: '#e8f0fe',
-                        bodyColor: 'rgba(232,240,254,0.6)',
+                        titleColor: '#1a202c',
+                        bodyColor: 'rgba(26,32,44,0.8)',
                         callbacks: {
                             label: ctx => ` Stress: ${ctx.raw}%`
                         }
@@ -410,9 +410,9 @@
                 },
                 scales: {
                     x: {
-                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                        grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
                         ticks: {
-                            color: 'rgba(232,240,254,0.4)',
+                            color: 'rgba(26,32,44,0.6)',
                             font: { family: 'DM Sans', size: 11 },
                             maxRotation: 0,
                         },
@@ -421,9 +421,9 @@
                     y: {
                         min: 0,
                         max: 100,
-                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                        grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
                         ticks: {
-                            color: 'rgba(232,240,254,0.4)',
+                            color: 'rgba(26,32,44,0.6)',
                             font: { family: 'DM Sans', size: 11 },
                             callback: v => v + '%',
                             stepSize: 25,
